@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>👑 ㄅㄆㄇ 夢幻打字魔法 👑</title>
+    <style>
+        /* CSS 樣式 - 保持繽紛粉嫩風格，針對中文字型優化 */
+        body {
+            font-family: "Microsoft JhengHei", "Heiti TC", "PingFang TC", sans-serif;
+            background: linear-gradient(135deg, #FFDAB9 0%, #FFB6C1 50%, #ADD8E6 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            color: #333;
+            text-align: center;
+            overflow: hidden;
+        }
+
+        .game-container {
+            background-color: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 25px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            max-width: 850px;
+            width: 90%;
+            border: 6px solid #FF69B4;
+            position: relative;
+        }
+
+        h1 {
+            color: #C71585;
+            font-size: 2.2em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px #FFDAB9;
+        }
+
+        .tip-box {
+            background-color: #FFFACD;
+            color: #FF4500;
+            padding: 10px;
+            border-radius: 8px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            border: 2px dashed #FFD700;
+            font-size: 0.9em;
+        }
+
+        .controls {
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #F0FFF0;
+            border-radius: 10px;
+            border: 2px solid #90EE90;
+        }
+        
+        .control-group {
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .controls label {
+            font-weight: bold;
+            color: #6A5ACD;
+            font-size: 1.1em;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+        }
+
+        .controls input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            margin-right: 5px;
+            accent-color: #FF69B4;
+        }
+        
+        .controls select {
+            padding: 5px 10px;
+            border-radius: 5px;
+            border: 1px solid #FFC0CB;
+            color: #C71585;
+            font-weight: bold;
+        }
+
+        #target-box {
+            background-color: #F0F8FF;
+            border: 10px solid #FFC0CB;
+            border-radius: 20px;
+            padding: 20px 0;
+            margin: 20px auto;
+            width: 220px;
+            height: 220px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 0 25px rgba(255, 105, 180, 0.7);
+            transition: transform 0.1s, box-shadow 0.3s;
+            position: relative;
+        }
+
+        .sparkle-effect {
+            box-shadow: 0 0 40px 10px #FFFF00, 0 0 80px 20px #FFD700;
+            transform: scale(1.05);
+        }
+
+        .shake-effect {
+            animation: shake 0.2s ease-in-out;
+            box-shadow: 0 0 25px 5px #FF4500;
+        }
+
+        @keyframes shake {
+            0% { transform: translate(1px, 1px) rotate(0deg); }
+            25% { transform: translate(-1px, -2px) rotate(-1deg); }
+            50% { transform: translate(1px, 2px) rotate(1deg); }
+            75% { transform: translate(-1px, -1px) rotate(-1deg); }
+            100% { transform: translate(1px, 1px) rotate(0deg); }
+        }
+
+        #target-symbol {
+            font-size: 8em;
+            font-weight: bold;
+            color: #8A2BE2;
+            line-height: 1;
+            margin-bottom: 10px;
+        }
+        
+        #hint-key {
+            font-size: 1.2em;
+            color: #aaa;
+            background: #fff;
+            padding: 2px 10px;
+            border-radius: 10px;
+            border: 1px solid #ddd;
+        }
+
+        /* 訊息板與分數區 */
+        #message-board {
+            font-size: 1.2em;
+            min-height: 1.5em;
+            margin: 10px 0;
+            font-weight: bold;
+        }
+        .correct { color: #32CD32; }
+        .wrong { color: #FF4500; }
+
+        .info-board {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            margin-top: 20px;
+            font-size: 1.1em;
+        }
+        
+        .info-item {
+            padding: 10px 15px;
+            border-radius: 10px;
+            font-weight: bold;
+            margin: 5px;
+        }
+        
+        #data-board { background-color: #F0FFFF; color: #008B8B; border: 2px solid #87CEFA; }
+        #timer-board { background-color: #E6E6FA; color: #4B0082; border: 2px solid #DDA0DD; }
+        #score-board { background-color: #FFE4E1; color: #FF1493; border: 2px solid #FFB6C1; }
+        
+        .result-detail {
+            background-color: #FFF0F5;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 15px;
+            border: 1px dashed #FF69B4;
+            font-size: 1.1em;
+            text-align: left;
+        }
+        
+        .end-message { color: #C71585; font-size: 1.5em; margin-top: 20px; font-weight: bold; }
+        
+        #star-rewards {
+            font-size: 3em;
+            margin: 10px 0;
+            color: gold;
+            text-shadow: 1px 1px 3px #DDA0DD;
+        }
+        
+        #perfect-star {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 15em;
+            color: #FFD700;
+            text-shadow: 0 0 10px #FF69B4, 0 0 20px #FFD700;
+            opacity: 0;
+            transition: opacity 1s;
+            pointer-events: none;
+            z-index: 200;
+        }
+        
+        .show-perfect { opacity: 1 !important; animation: bounce 0.5s ease-out; }
+        @keyframes bounce {
+            0% { transform: translate(-50%, -50%) scale(0.5); }
+            70% { transform: translate(-50%, -50%) scale(1.1); }
+            100% { transform: translate(-50%, -50%) scale(1); }
+        }
+
+        button {
+            background-color: #FF69B4;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 1.3em;
+            border-radius: 50px;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: all 0.3s;
+            box-shadow: 0 4px 0 #C71585;
+        }
+        button:hover { background-color: #FF1493; transform: translateY(-2px); }
+        button:active { transform: translateY(2px); box-shadow: 0 0 0 #C71585; }
+        button:disabled { background-color: #ccc; box-shadow: none; cursor: not-allowed; }
+
+        #flash-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(255, 255, 255, 0);
+            pointer-events: none;
+            transition: background-color 0.1s ease-out;
+            z-index: 1000;
+        }
+        .correct-flash { background-color: rgba(255, 255, 255, 0.4); }
+        .wrong-flash { background-color: rgba(255, 0, 0, 0.2); }
+
+    </style>
+</head>
+<body>
+    
+    <div id="flash-overlay"></div>
+    <div id="perfect-star">⭐</div>
+
+    <div class="game-container">
+        <h1>👑 ㄅㄆㄇ 夢幻打字魔法 👑</h1>
+        <div class="tip-box">
+            📢 貼心提醒：請將輸入法切換為【英文模式 (Eng)】，看著鍵盤上的注音符號直接按鍵即可！
+        </div>
+
+        <div class="controls">
+            <div class="control-group">
+                 <label for="challenge-time">⏱️ 挑戰時間:</label>
+                 <select id="challenge-time">
+                     <option value="60">60 秒 (1 分鐘)</option>
+                     <option value="120">120 秒 (2 分鐘)</option>
+                     <option value="300">300 秒 (5 分鐘)</option>
+                     <option value="0">不限時練習</option>
+                 </select>
+            </div>
+            
+            <div class="control-group" style="border-top: 1px dashed #90EE90; padding-top: 10px; margin-top: 5px;">
+                <label><input type="checkbox" id="group-initials" checked> 聲母 (ㄅ-ㄙ)</label>
+                <label><input type="checkbox" id="group-finals" checked> 韻母/介音 (ㄧ-ㄩ, ㄚ-ㄦ)</label>
+                <label><input type="checkbox" id="group-tones"> 聲調符號 (ˊˇˋ˙)</label>
+                <label><input type="checkbox" id="group-punctuations"> 標點符號 (，。、)</label>
+            </div>
+        </div>
+        
+        <button id="start-button">開始魔法挑戰</button>
+        <button id="stop-button" style="display: none;">停止挑戰</button>
+
+        <div id="target-box">
+            <div id="target-symbol">ㄅ</div>
+            <div id="hint-key">按鍵: 1</div>
+        </div>
+
+        <div id="message-board">準備好了嗎？</div>
+
+        <div class="info-board">
+            <div id="timer-board" class="info-item">時間：<span id="timer">0</span></div>
+            <div id="data-board" class="info-item">總題數：<span id="total-count">0</span> | 準確率：<span id="accuracy-percent">0.00</span>%</div>
+            <div id="score-board" class="info-item">答對：<span id="score">0</span> | 答錯：<span id="wrong-count">0</span></div>
+        </div>
+        
+        <div id="result-details" style="display: none;"></div>
+    </div>
+
+    <script>
+        // --- 注音符號對照表 (標準大易/標準鍵盤配置) ---
+        // key: 鍵盤上的英文字, value: 對應的注音
+        const bpmMap = {
+            '1': 'ㄅ', 'q': 'ㄆ', 'a': 'ㄇ', 'z': 'ㄈ',
+            '2': 'ㄉ', 'w': 'ㄊ', 's': 'ㄋ', 'x': 'ㄌ',
+            '3': 'ˇ', 'e': 'ㄍ', 'd': 'ㄎ', 'c': 'ㄏ',
+            '4': 'ˋ', 'r': 'ㄐ', 'f': 'ㄑ', 'v': 'ㄒ',
+            '5': 'ㄓ', 't': 'ㄔ', 'g': 'ㄕ', 'b': 'ㄖ',
+            '6': 'ˊ', 'y': 'ㄗ', 'h': 'ㄘ', 'n': 'ㄙ',
+            '7': '˙', 'u': 'ㄧ', 'j': 'ㄨ', 'm': 'ㄩ',
+            '8': 'ㄚ', 'i': 'ㄛ', 'k': 'ㄜ', ',': 'ㄝ',
+            '9': 'ㄞ', 'o': 'ㄟ', 'l': 'ㄠ', '.': 'ㄡ',
+            '0': 'ㄢ', 'p': 'ㄣ', ';': 'ㄤ', '/': 'ㄥ',
+            '-': 'ㄦ'
+        };
+
+        // 標點符號對照 (Shift 組合) - 為了簡化，這裡偵測按鍵對應
+        // 注意：小遊戲中，讓小朋友按 Shift 比較難，
+        // 我們這裡設計為：按下對應的按鍵即可 (例如按 < 就代表 ，)
+        const punctMap = {
+            '<': '，', ',': '，',  // 兼容按逗號
+            '>': '。', '.': '。',  // 兼容按句號
+            '?': '？', '/': '？',
+            '\'': '、'
+        };
+
+        // 分組資料
+        const groups = {
+            initials: ['ㄅ','ㄆ','ㄇ','ㄈ','ㄉ','ㄊ','ㄋ','ㄌ','ㄍ','ㄎ','ㄏ','ㄐ','ㄑ','ㄒ','ㄓ','ㄔ','ㄕ','ㄖ','ㄗ','ㄘ','ㄙ'],
+            finals: ['ㄧ','ㄨ','ㄩ','ㄚ','ㄛ','ㄜ','ㄝ','ㄞ','ㄟ','ㄠ','ㄡ','ㄢ','ㄣ','ㄤ','ㄥ','ㄦ'],
+            tones: ['ˊ', 'ˇ', 'ˋ', '˙'],
+            punctuations: ['，', '。', '？', '、']
+        };
+
+        // 反向查表：給注音，找按鍵 (用於顯示提示與比對)
+        function findKeyBySymbol(symbol) {
+            // 先找一般注音
+            for (let key in bpmMap) {
+                if (bpmMap[key] === symbol) return key;
+            }
+            // 找標點
+            for (let key in punctMap) {
+                if (punctMap[key] === symbol) {
+                    // 優先回傳不用 Shift 的版本供顯示
+                    if (symbol === '，') return '<';
+                    if (symbol === '。') return '>';
+                    if (symbol === '？') return '?';
+                    return key;
+                }
+            }
+            return '?';
+        }
+
+        // DOM 元素
+        const targetBox = document.getElementById('target-box');
+        const targetSymbolEl = document.getElementById('target-symbol');
+        const hintKeyEl = document.getElementById('hint-key');
+        const messageBoard = document.getElementById('message-board');
+        const scoreEl = document.getElementById('score');
+        const wrongCountEl = document.getElementById('wrong-count');
+        const totalCountEl = document.getElementById('total-count');
+        const accuracyEl = document.getElementById('accuracy-percent');
+        const timerEl = document.getElementById('timer');
+        const startBtn = document.getElementById('start-button');
+        const stopBtn = document.getElementById('stop-button');
+        const timeSelect = document.getElementById('challenge-time');
+        const resultDetails = document.getElementById('result-details');
+        const perfectStar = document.getElementById('perfect-star');
+        const flashOverlay = document.getElementById('flash-overlay');
+
+        // 選項 Checkbox
+        const cbInitials = document.getElementById('group-initials');
+        const cbFinals = document.getElementById('group-finals');
+        const cbTones = document.getElementById('group-tones');
+        const cbPunct = document.getElementById('group-punctuations');
+
+        let currentPool = [];
+        let currentTargetSymbol = '';
+        let currentExpectedKeys = []; // 支援多個按鍵 (如標點)
+        
+        let score = 0;
+        let wrongCount = 0;
+        let startTime = 0;
+        let initialTime = 0;
+        let timeLeft = 0;
+        let timerInterval = null;
+        let gameActive = false;
+
+        // --- 視覺特效 ---
+        function applyEffect(type) {
+            const isCorrect = type === 'correct';
+            targetBox.classList.add(isCorrect ? 'sparkle-effect' : 'shake-effect');
+            flashOverlay.classList.add(isCorrect ? 'correct-flash' : 'wrong-flash');
+            
+            setTimeout(() => {
+                targetBox.classList.remove('sparkle-effect', 'shake-effect');
+                flashOverlay.classList.remove('correct-flash', 'wrong-flash');
+            }, 300);
+        }
+
+        // --- 邏輯函數 ---
+
+        function updateScoreboard() {
+            scoreEl.textContent = score;
+            wrongCountEl.textContent = wrongCount;
+            const total = score + wrongCount;
+            totalCountEl.textContent = total;
+            const acc = total > 0 ? (score / total * 100).toFixed(1) : '0.00';
+            accuracyEl.textContent = acc;
+        }
+
+        function formatTime(sec) {
+            if (sec < 0) sec = 0;
+            const m = Math.floor(sec / 60);
+            const s = sec % 60;
+            return `${m}:${s < 10 ? '0' + s : s}`;
+        }
+
+        function updatePool() {
+            currentPool = [];
+            if (cbInitials.checked) currentPool = currentPool.concat(groups.initials);
+            if (cbFinals.checked) currentPool = currentPool.concat(groups.finals);
+            if (cbTones.checked) currentPool = currentPool.concat(groups.tones);
+            if (cbPunct.checked) currentPool = currentPool.concat(groups.punctuations);
+            
+            if (currentPool.length === 0) {
+                alert("請至少選擇一種注音類型！");
+                cbInitials.checked = true;
+                currentPool = groups.initials;
+            }
+        }
+
+        function setNextQuestion() {
+            if (!gameActive) return;
+            
+            updatePool();
+            const randomIndex = Math.floor(Math.random() * currentPool.length);
+            currentTargetSymbol = currentPool[randomIndex];
+            
+            // 找出對應按鍵
+            currentExpectedKeys = [];
+            
+            // 1. 檢查一般注音表
+            for (let [k, v] of Object.entries(bpmMap)) {
+                if (v === currentTargetSymbol) currentExpectedKeys.push(k);
+            }
+            // 2. 檢查標點表
+            for (let [k, v] of Object.entries(punctMap)) {
+                if (v === currentTargetSymbol) currentExpectedKeys.push(k);
+            }
+
+            // 更新畫面
+            targetSymbolEl.textContent = currentTargetSymbol;
+            
+            // 顯示提示 (取第一個合法的按鍵當提示)
+            let displayKey = currentExpectedKeys[0];
+            if (displayKey === ' ') displayKey = 'Space';
+            
+            // 標點符號的特殊提示文字
+            if (currentTargetSymbol === '，') displayKey = '<';
+            if (currentTargetSymbol === '。') displayKey = '>';
+            if (currentTargetSymbol === '？') displayKey = '?';
+            
+            hintKeyEl.textContent = `按鍵: ${displayKey.toUpperCase()}`;
+            
+            messageBoard.textContent = ''; 
+            messageBoard.className = ''; 
+        }
+
+        function endGame() {
+            if (!gameActive) return;
+            gameActive = false;
+            clearInterval(timerInterval);
+            document.removeEventListener('keydown', handleInput);
+
+            // 計算結果
+            const total = score + wrongCount;
+            const accuracy = total > 0 ? (score / total) : 0;
+            const duration = (initialTime > 0) ? initialTime : Math.floor((Date.now() - startTime) / 1000);
+            const spm = duration > 0 ? Math.round(score / (duration / 60)) : 0; // 字/分
+
+            // 星星判定
+            let stars = '☆☆☆';
+            let isPerfect = false;
+            if (accuracy >= 0.95 && total > 5) { stars = '⭐⭐⭐'; isPerfect = (score === total); }
+            else if (accuracy >= 0.8) stars = '⭐⭐';
+            else if (accuracy >= 0.5) stars = '⭐';
+
+            targetSymbolEl.textContent = 'END';
+            hintKeyEl.textContent = '';
+            
+            messageBoard.innerHTML = `<div class="end-message">挑戰結束！</div><div id="star-rewards">${stars}</div>`;
+            
+            resultDetails.style.display = 'block';
+            resultDetails.innerHTML = `
+                <div class="result-detail">
+                    <strong>📊 成果發表</strong><br>
+                    ▸ 答對題數: <span style="color:green">${score}</span> (錯 ${wrongCount})<br>
+                    ▸ 準確率: <strong>${(accuracy*100).toFixed(1)}%</strong><br>
+                    ▸ 打字速度: <strong>${spm}</strong> 字/分<br>
+                </div>
+            `;
+
+            if (isPerfect && score > 0) perfectStar.classList.add('show-perfect');
+
+            startBtn.style.display = 'inline-block';
+            startBtn.textContent = '再來一次';
+            stopBtn.style.display = 'none';
+            toggleControls(false);
+        }
+
+        function handleInput(e) {
+            if (!gameActive) return;
+            
+            // 忽略功能鍵 (Shift, Ctrl, etc.)
+            if (e.key.length > 1 && !['<', '>', '?', '"', ':', '{', '}', '_', '+'].includes(e.key)) return;
+
+            const inputKey = e.key.toLowerCase();
+            const inputKeyOriginal = e.key;
+
+            // 檢查是否為正確按鍵
+            let isCorrect = false;
+            
+            // 比對邏輯：
+            // 1. 直接比對 key (例如按下 '1')
+            if (currentExpectedKeys.includes(inputKey)) isCorrect = true;
+            // 2. 比對原始符號 (例如按下 ',' 對應 'ㄝ' 或 '，')
+            if (currentExpectedKeys.includes(inputKeyOriginal)) isCorrect = true;
+
+            if (isCorrect) {
+                score++;
+                applyEffect('correct');
+                messageBoard.textContent = '🌟 答對了！好棒！';
+                messageBoard.className = 'correct';
+                updateScoreboard();
+                setTimeout(setNextQuestion, 150);
+            } else {
+                wrongCount++;
+                applyEffect('wrong');
+                messageBoard.textContent = `哎呀！不是按 ${inputKeyOriginal} 喔～ 加油！`;
+                messageBoard.className = 'wrong';
+                updateScoreboard();
+            }
+        }
+
+        function toggleControls(disabled) {
+            timeSelect.disabled = disabled;
+            cbInitials.disabled = disabled;
+            cbFinals.disabled = disabled;
+            cbTones.disabled = disabled;
+            cbPunct.disabled = disabled;
+        }
+
+        function startGame() {
+            clearInterval(timerInterval);
+            if (gameActive) return;
+            
+            updatePool(); // 確保有題目
+            
+            initialTime = parseInt(timeSelect.value);
+            timeLeft = initialTime;
+            score = 0; 
+            wrongCount = 0;
+            gameActive = true;
+
+            // UI 重置
+            perfectStar.classList.remove('show-perfect');
+            resultDetails.style.display = 'none';
+            startBtn.style.display = 'none';
+            stopBtn.style.display = 'inline-block';
+            updateScoreboard();
+            toggleControls(true);
+
+            // 計時
+            startTime = Date.now();
+            if (initialTime > 0) {
+                timerEl.textContent = formatTime(timeLeft);
+                timerInterval = setInterval(() => {
+                    timeLeft--;
+                    timerEl.textContent = formatTime(timeLeft);
+                    if (timeLeft <= 0) endGame();
+                }, 1000);
+            } else {
+                timerEl.textContent = "0:00";
+                timerInterval = setInterval(() => {
+                    let elapsed = Math.floor((Date.now() - startTime) / 1000);
+                    timerEl.textContent = formatTime(elapsed);
+                }, 1000);
+            }
+
+            setNextQuestion();
+            document.addEventListener('keydown', handleInput);
+        }
+
+        // 初始化
+        startBtn.addEventListener('click', startGame);
+        stopBtn.addEventListener('click', endGame);
+        timeSelect.addEventListener('change', () => {
+             if(!gameActive) timerEl.textContent = formatTime(parseInt(timeSelect.value));
+        });
+        
+        // 預設顯示時間
+        timerEl.textContent = formatTime(parseInt(timeSelect.value));
+
+    </script>
+</body>
+</html>
