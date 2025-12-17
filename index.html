@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>👑 ㄅㄆㄇ 夢幻打字魔法 👑</title>
     <style>
-        /* CSS 樣式 - 保持繽紛粉嫩風格，針對中文字型優化 */
+        /* CSS 樣式 - 保持繽紛粉嫩風格 */
         body {
             font-family: "Microsoft JhengHei", "Heiti TC", "PingFang TC", sans-serif;
             background: linear-gradient(135deg, #FFDAB9 0%, #FFB6C1 50%, #ADD8E6 100%);
@@ -129,17 +129,11 @@
             font-weight: bold;
             color: #8A2BE2;
             line-height: 1;
-            margin-bottom: 10px;
+            /* 移除 margin-bottom 因為不再有提示文字了 */
+            margin-bottom: 0; 
         }
         
-        #hint-key {
-            font-size: 1.2em;
-            color: #aaa;
-            background: #fff;
-            padding: 2px 10px;
-            border-radius: 10px;
-            border: 1px solid #ddd;
-        }
+        /* 移除 #hint-key 樣式 */
 
         /* 訊息板與分數區 */
         #message-board {
@@ -272,8 +266,7 @@
 
         <div id="target-box">
             <div id="target-symbol">ㄅ</div>
-            <div id="hint-key">按鍵: 1</div>
-        </div>
+            </div>
 
         <div id="message-board">準備好了嗎？</div>
 
@@ -304,8 +297,6 @@
         };
 
         // 標點符號對照 (Shift 組合) - 為了簡化，這裡偵測按鍵對應
-        // 注意：小遊戲中，讓小朋友按 Shift 比較難，
-        // 我們這裡設計為：按下對應的按鍵即可 (例如按 < 就代表 ，)
         const punctMap = {
             '<': '，', ',': '，',  // 兼容按逗號
             '>': '。', '.': '。',  // 兼容按句號
@@ -321,29 +312,10 @@
             punctuations: ['，', '。', '？', '、']
         };
 
-        // 反向查表：給注音，找按鍵 (用於顯示提示與比對)
-        function findKeyBySymbol(symbol) {
-            // 先找一般注音
-            for (let key in bpmMap) {
-                if (bpmMap[key] === symbol) return key;
-            }
-            // 找標點
-            for (let key in punctMap) {
-                if (punctMap[key] === symbol) {
-                    // 優先回傳不用 Shift 的版本供顯示
-                    if (symbol === '，') return '<';
-                    if (symbol === '。') return '>';
-                    if (symbol === '？') return '?';
-                    return key;
-                }
-            }
-            return '?';
-        }
-
         // DOM 元素
         const targetBox = document.getElementById('target-box');
         const targetSymbolEl = document.getElementById('target-symbol');
-        const hintKeyEl = document.getElementById('hint-key');
+        // 移除 hintKeyEl 的選取
         const messageBoard = document.getElementById('message-board');
         const scoreEl = document.getElementById('score');
         const wrongCountEl = document.getElementById('wrong-count');
@@ -365,7 +337,7 @@
 
         let currentPool = [];
         let currentTargetSymbol = '';
-        let currentExpectedKeys = []; // 支援多個按鍵 (如標點)
+        let currentExpectedKeys = []; 
         
         let score = 0;
         let wrongCount = 0;
@@ -441,16 +413,7 @@
             // 更新畫面
             targetSymbolEl.textContent = currentTargetSymbol;
             
-            // 顯示提示 (取第一個合法的按鍵當提示)
-            let displayKey = currentExpectedKeys[0];
-            if (displayKey === ' ') displayKey = 'Space';
-            
-            // 標點符號的特殊提示文字
-            if (currentTargetSymbol === '，') displayKey = '<';
-            if (currentTargetSymbol === '。') displayKey = '>';
-            if (currentTargetSymbol === '？') displayKey = '?';
-            
-            hintKeyEl.textContent = `按鍵: ${displayKey.toUpperCase()}`;
+            // --- 這裡移除了提示按鍵的程式碼 ---
             
             messageBoard.textContent = ''; 
             messageBoard.className = ''; 
@@ -476,7 +439,7 @@
             else if (accuracy >= 0.5) stars = '⭐';
 
             targetSymbolEl.textContent = 'END';
-            hintKeyEl.textContent = '';
+            // 移除清空 hint 的程式碼
             
             messageBoard.innerHTML = `<div class="end-message">挑戰結束！</div><div id="star-rewards">${stars}</div>`;
             
