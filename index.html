@@ -37,6 +37,19 @@
             text-shadow: 2px 2px 4px #FFDAB9;
         }
 
+        /* 新增：裝置建議區塊 (藍色系) */
+        .device-note {
+            background-color: #E0FFFF;
+            color: #008080;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            border: 2px dashed #48D1CC;
+            font-size: 1.1em;
+        }
+
+        /* 原有：輸入法提醒區塊 (黃色系) */
         .tip-box {
             background-color: #FFFACD;
             color: #FF4500;
@@ -129,13 +142,9 @@
             font-weight: bold;
             color: #8A2BE2;
             line-height: 1;
-            /* 移除 margin-bottom 因為不再有提示文字了 */
             margin-bottom: 0; 
         }
-        
-        /* 移除 #hint-key 樣式 */
 
-        /* 訊息板與分數區 */
         #message-board {
             font-size: 1.2em;
             min-height: 1.5em;
@@ -238,6 +247,11 @@
 
     <div class="game-container">
         <h1>👑 ㄅㄆㄇ 夢幻打字魔法 👑</h1>
+        
+        <div class="device-note">
+            💻 由於是打字練習，建議使用：<br>「電腦」或「接鍵盤的平板」遊玩喔！
+        </div>
+
         <div class="tip-box">
             📢 貼心提醒：請將輸入法切換為【英文模式 (Eng)】，看著鍵盤上的注音符號直接按鍵即可！
         </div>
@@ -266,7 +280,7 @@
 
         <div id="target-box">
             <div id="target-symbol">ㄅ</div>
-            </div>
+        </div>
 
         <div id="message-board">準備好了嗎？</div>
 
@@ -281,7 +295,6 @@
 
     <script>
         // --- 注音符號對照表 (標準大易/標準鍵盤配置) ---
-        // key: 鍵盤上的英文字, value: 對應的注音
         const bpmMap = {
             '1': 'ㄅ', 'q': 'ㄆ', 'a': 'ㄇ', 'z': 'ㄈ',
             '2': 'ㄉ', 'w': 'ㄊ', 's': 'ㄋ', 'x': 'ㄌ',
@@ -296,15 +309,13 @@
             '-': 'ㄦ'
         };
 
-        // 標點符號對照 (Shift 組合) - 為了簡化，這裡偵測按鍵對應
         const punctMap = {
-            '<': '，', ',': '，',  // 兼容按逗號
-            '>': '。', '.': '。',  // 兼容按句號
+            '<': '，', ',': '，',  
+            '>': '。', '.': '。',  
             '?': '？', '/': '？',
             '\'': '、'
         };
 
-        // 分組資料
         const groups = {
             initials: ['ㄅ','ㄆ','ㄇ','ㄈ','ㄉ','ㄊ','ㄋ','ㄌ','ㄍ','ㄎ','ㄏ','ㄐ','ㄑ','ㄒ','ㄓ','ㄔ','ㄕ','ㄖ','ㄗ','ㄘ','ㄙ'],
             finals: ['ㄧ','ㄨ','ㄩ','ㄚ','ㄛ','ㄜ','ㄝ','ㄞ','ㄟ','ㄠ','ㄡ','ㄢ','ㄣ','ㄤ','ㄥ','ㄦ'],
@@ -315,7 +326,6 @@
         // DOM 元素
         const targetBox = document.getElementById('target-box');
         const targetSymbolEl = document.getElementById('target-symbol');
-        // 移除 hintKeyEl 的選取
         const messageBoard = document.getElementById('message-board');
         const scoreEl = document.getElementById('score');
         const wrongCountEl = document.getElementById('wrong-count');
@@ -398,23 +408,15 @@
             const randomIndex = Math.floor(Math.random() * currentPool.length);
             currentTargetSymbol = currentPool[randomIndex];
             
-            // 找出對應按鍵
             currentExpectedKeys = [];
-            
-            // 1. 檢查一般注音表
             for (let [k, v] of Object.entries(bpmMap)) {
                 if (v === currentTargetSymbol) currentExpectedKeys.push(k);
             }
-            // 2. 檢查標點表
             for (let [k, v] of Object.entries(punctMap)) {
                 if (v === currentTargetSymbol) currentExpectedKeys.push(k);
             }
 
-            // 更新畫面
             targetSymbolEl.textContent = currentTargetSymbol;
-            
-            // --- 這裡移除了提示按鍵的程式碼 ---
-            
             messageBoard.textContent = ''; 
             messageBoard.className = ''; 
         }
@@ -425,13 +427,11 @@
             clearInterval(timerInterval);
             document.removeEventListener('keydown', handleInput);
 
-            // 計算結果
             const total = score + wrongCount;
             const accuracy = total > 0 ? (score / total) : 0;
             const duration = (initialTime > 0) ? initialTime : Math.floor((Date.now() - startTime) / 1000);
-            const spm = duration > 0 ? Math.round(score / (duration / 60)) : 0; // 字/分
+            const spm = duration > 0 ? Math.round(score / (duration / 60)) : 0; 
 
-            // 星星判定
             let stars = '☆☆☆';
             let isPerfect = false;
             if (accuracy >= 0.95 && total > 5) { stars = '⭐⭐⭐'; isPerfect = (score === total); }
@@ -439,7 +439,6 @@
             else if (accuracy >= 0.5) stars = '⭐';
 
             targetSymbolEl.textContent = 'END';
-            // 移除清空 hint 的程式碼
             
             messageBoard.innerHTML = `<div class="end-message">挑戰結束！</div><div id="star-rewards">${stars}</div>`;
             
@@ -464,19 +463,13 @@
         function handleInput(e) {
             if (!gameActive) return;
             
-            // 忽略功能鍵 (Shift, Ctrl, etc.)
             if (e.key.length > 1 && !['<', '>', '?', '"', ':', '{', '}', '_', '+'].includes(e.key)) return;
 
             const inputKey = e.key.toLowerCase();
             const inputKeyOriginal = e.key;
 
-            // 檢查是否為正確按鍵
             let isCorrect = false;
-            
-            // 比對邏輯：
-            // 1. 直接比對 key (例如按下 '1')
             if (currentExpectedKeys.includes(inputKey)) isCorrect = true;
-            // 2. 比對原始符號 (例如按下 ',' 對應 'ㄝ' 或 '，')
             if (currentExpectedKeys.includes(inputKeyOriginal)) isCorrect = true;
 
             if (isCorrect) {
@@ -507,7 +500,7 @@
             clearInterval(timerInterval);
             if (gameActive) return;
             
-            updatePool(); // 確保有題目
+            updatePool(); 
             
             initialTime = parseInt(timeSelect.value);
             timeLeft = initialTime;
@@ -515,7 +508,6 @@
             wrongCount = 0;
             gameActive = true;
 
-            // UI 重置
             perfectStar.classList.remove('show-perfect');
             resultDetails.style.display = 'none';
             startBtn.style.display = 'none';
@@ -523,7 +515,6 @@
             updateScoreboard();
             toggleControls(true);
 
-            // 計時
             startTime = Date.now();
             if (initialTime > 0) {
                 timerEl.textContent = formatTime(timeLeft);
@@ -544,14 +535,12 @@
             document.addEventListener('keydown', handleInput);
         }
 
-        // 初始化
         startBtn.addEventListener('click', startGame);
         stopBtn.addEventListener('click', endGame);
         timeSelect.addEventListener('change', () => {
              if(!gameActive) timerEl.textContent = formatTime(parseInt(timeSelect.value));
         });
         
-        // 預設顯示時間
         timerEl.textContent = formatTime(parseInt(timeSelect.value));
 
     </script>
